@@ -4,11 +4,11 @@
   "type": "module",
   "description": "Steakz restaurant management backend API",
   "main": "dist/index.js",
-  "scripts": {
+"scripts": {
     "dev": "nodemon --watch src --ext ts --exec tsx src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "postinstall": "prisma generate",
+    "postinstall": "npx prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:seed": "tsx src/lib/seed.ts",
     "db:studio": "prisma studio"
