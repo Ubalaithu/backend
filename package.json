@@ -2,9 +2,16 @@
   "name": "steakz-backend",
   "version": "1.0.0",
   "type": "module",
+  "description": "Steakz restaurant management backend API",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --watch src --ext ts --exec tsx src/index.ts",
-    "start": "node dist/index.js"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "tsx src/lib/seed.ts",
+    "db:studio": "prisma studio"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
@@ -27,5 +34,8 @@
     "prisma": "^6.19.3",
     "tsx": "^4.21.0",
     "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
