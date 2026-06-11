@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+startup.log
+startup.err
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Cache
+.cache/
+.eslintcache
+
+# Uploads (keep the directory but ignore contents)
+uploads/*
+!uploads/.gitkeep
+
+# Prisma
+prisma/migrations/*.db
+prisma/*.db
+
+# Testing
+.temp/
+.tmp/
+
+# Temporary files
+*.tmp
+*.temp
