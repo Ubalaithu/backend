@@ -49,10 +49,17 @@ router.get('/staff', async (req: Request, res: Response) => {
 router.get('/bookings', async (req: Request, res: Response) => {
   const branchId = req.user!.branchId!;
   const { page, limit, skip } = paginationParams(req.query as Record<string, unknown>);
+  const dateParam = req.query['date'] as string | undefined;
+
+  const dateFilter = dateParam
+    ? { date: { gte: new Date(dateParam + 'T00:00:00'), lt: new Date(dateParam + 'T23:59:59') } }
+    : {};
+
+  const where = { table: { branchId }, ...dateFilter };
 
   const [bookings, total] = await Promise.all([
     prisma.booking.findMany({
-      where:   { table: { branchId } },
+      where,
       include: {
         customer: { select: { name: true } },
         table:    { select: { tableNumber: true } },
@@ -61,7 +68,7 @@ router.get('/bookings', async (req: Request, res: Response) => {
       skip,
       take: limit,
     }),
-    prisma.booking.count({ where: { table: { branchId } } }),
+    prisma.booking.count({ where }),
   ]);
 
   res.json(paginated(bookings, total, page, limit));

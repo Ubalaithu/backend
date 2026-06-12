@@ -26,6 +26,27 @@ router.get('/orders', async (req: Request, res: Response) => {
   res.json(paginated(orders, total, page, limit));
 });
 
+router.patch('/orders/:id/preparing', async (req: Request, res: Response) => {
+  const branchId = req.user!.branchId!;
+  const id = parseInt(req.params['id'] as string ?? '0');
+  const order = await prisma.order.findUnique({ where: { id } });
+  if (!order || order.branchId !== branchId) {
+    res.status(403).json({ error: 'Order not found in your branch.' });
+    return;
+  }
+  const updated = await prisma.order.update({
+    where:   { id },
+    data:    { status: 'PREPARING' },
+    include: { items: { include: { menuItem: true } }, branch: { select: { name: true } } },
+  });
+
+  const io = getIO();
+  io.to(`branch_${branchId}`).emit('order:updated', updated);
+  io.to('hq').emit('order:updated', updated);
+
+  res.json(updated);
+});
+
 router.patch('/orders/:id/done', async (req: Request, res: Response) => {
   const branchId = req.user!.branchId!;
   const id = parseInt(req.params['id'] as string ?? '0');

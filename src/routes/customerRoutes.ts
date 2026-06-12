@@ -113,22 +113,25 @@ router.post('/orders', async (req: Request, res: Response) => {
   const priceMap = Object.fromEntries(menuItems.map(m => [m.id, m.price]));
   const total    = items.reduce((sum, i) => sum + (priceMap[i.menuItemId] ?? 0) * i.quantity, 0);
 
-  const order = await prisma.order.create({
-    data: {
-      customerId, bookingId, branchId, total,
-      items: {
-        create: items.map(i => ({
-          menuItemId: i.menuItemId,
-          quantity:   i.quantity,
-          unitPrice:  priceMap[i.menuItemId] ?? 0,
-        })),
+  const [order] = await prisma.$transaction([
+    prisma.order.create({
+      data: {
+        customerId, bookingId, branchId, total,
+        items: {
+          create: items.map(i => ({
+            menuItemId: i.menuItemId,
+            quantity:   i.quantity,
+            unitPrice:  priceMap[i.menuItemId] ?? 0,
+          })),
+        },
       },
-    },
-    include: {
-      items:  { include: { menuItem: true } },
-      branch: { select: { name: true } },
-    },
-  });
+      include: {
+        items:  { include: { menuItem: true } },
+        branch: { select: { name: true } },
+      },
+    }),
+    prisma.booking.update({ where: { id: bookingId }, data: { status: 'CONFIRMED' } }),
+  ]);
 
   const io = getIO();
   io.to(`branch_${branchId}`).emit('order:created', order);
